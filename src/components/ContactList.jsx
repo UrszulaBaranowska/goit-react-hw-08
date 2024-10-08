@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchContacts, deleteContact } from "../redux/contactsSlice";
-import Contact from "./Contact";
+import Contact from "../pages/Contact";
+import Fuse from "fuse.js";
 import styles from "./ContactList.module.css";
 
 const ContactList = () => {
@@ -13,18 +14,24 @@ const ContactList = () => {
   } = useSelector((state) => state.contacts);
   const filter = useSelector((state) => state.filters.name);
 
+  const [filteredContacts, setFilteredContacts] = useState(contacts);
+
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
 
-  console.log("Contacts in the component:", contacts);
+  useEffect(() => {
+    const fuse = new Fuse(contacts, {
+      keys: ["name", "number"],
+      threshold: 0.3
+    });
+    setFilteredContacts(
+      filter ? fuse.search(filter).map((result) => result.item) : contacts
+    );
+  }, [contacts, filter]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-
-  const filteredContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
-  );
 
   return (
     <div className={styles.contactList}>
