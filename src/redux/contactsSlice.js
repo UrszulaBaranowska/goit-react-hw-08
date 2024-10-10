@@ -6,42 +6,62 @@ const API_URL = "https://connections-api.goit.global/contacts";
 
 export const fetchContacts = createAsyncThunk(
   "contacts/fetchAll",
-  async (_, { getState }) => {
+  async (_, { getState, rejectWithValue }) => {
     const { token } = getState().auth;
-    const response = await axios.get(API_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return response.data;
+    if (!token) {
+      return rejectWithValue({ message: "Brak tokena autoryzacyjnego" });
+    }
+    try {
+      const response = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue({
+        message:
+          error.response?.data?.message || "Błąd podczas ładowania kontaktów."
+      });
+    }
   }
 );
 
 export const addContact = createAsyncThunk(
   "contacts/addContact",
-  async (newContact, { getState }) => {
+  async (newContact, { getState, rejectWithValue }) => {
     const { token } = getState().auth;
-    const response = await axios.post(API_URL, newContact, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    toast.success("Kontakt dodany!");
-    return response.data;
+    try {
+      const response = await axios.post(API_URL, newContact, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success("Kontakt dodany!");
+      return response.data;
+    } catch (error) {
+      toast.error("Błąd podczas dodawania kontaktu.");
+      return rejectWithValue(error.response?.data || "Błąd");
+    }
   }
 );
 
 export const deleteContact = createAsyncThunk(
   "contacts/deleteContact",
-  async (contactId, { getState }) => {
+  async (contactId, { getState, rejectWithValue }) => {
     const { token } = getState().auth;
-    await axios.delete(`${API_URL}/${contactId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    toast.success("Kontakt usunięty!");
-    return contactId;
+    try {
+      await axios.delete(`${API_URL}/${contactId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success("Kontakt usunięty!");
+      return contactId;
+    } catch (error) {
+      toast.error("Błąd podczas usuwania kontaktu.");
+      return rejectWithValue(error.response?.data || "Błąd");
+    }
   }
 );
 

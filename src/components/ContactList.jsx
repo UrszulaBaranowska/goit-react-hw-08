@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchContacts, deleteContact } from "../redux/contactsSlice";
-import Contact from "../pages/Contact";
+import ContactItem from "../pages/ContactItem";
 import Fuse from "fuse.js";
 import styles from "./ContactList.module.css";
 
@@ -33,14 +33,21 @@ const ContactList = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
+  const handleDelete = (contactId) => {
+    if (window.confirm("Czy na pewno chcesz usunąć ten kontakt?")) {
+      dispatch(deleteContact(contactId));
+    }
+  };
+
   return (
     <div className={styles.contactList}>
       {filteredContacts.length > 0 ? (
         filteredContacts.map((contact) => (
-          <Contact
+          <ContactItem
             key={contact.id}
             contact={contact}
-            onDelete={() => dispatch(deleteContact(contact.id))}
+            onDelete={() => handleDelete(contact.id)}
+            onEdit={() => setEditingContact(contact)}
           />
         ))
       ) : (
