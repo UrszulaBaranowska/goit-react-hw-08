@@ -9,7 +9,8 @@ export const fetchContacts = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     const { token } = getState().auth;
     if (!token) {
-      return rejectWithValue({ message: "Brak tokena autoryzacyjnego" });
+      toast.error("Brak tokena autoryzacyjnego. Zaloguj się ponownie.");
+      return rejectWithValue("Brak tokena autoryzacyjnego.");
     }
     try {
       const response = await axios.get(API_URL, {
@@ -17,12 +18,11 @@ export const fetchContacts = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
+      toast.success("Kontakty zostały pobrane!");
       return response.data;
     } catch (error) {
-      return rejectWithValue({
-        message:
-          error.response?.data?.message || "Błąd podczas ładowania kontaktów."
-      });
+      toast.error("Błąd podczas pobierania kontaktów.");
+      return rejectWithValue(error.response?.data?.message || "Błąd");
     }
   }
 );
@@ -67,15 +67,20 @@ export const deleteContact = createAsyncThunk(
 
 export const updateContact = createAsyncThunk(
   "contacts/updateContact",
-  async ({ id, updatedData }, { getState }) => {
+  async ({ id, updatedData }, { getState, rejectWithValue }) => {
     const { token } = getState().auth;
-    const response = await axios.patch(`${API_URL}/${id}`, updatedData, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    toast.success("Kontakt zaktualizowany!");
-    return response.data;
+    try {
+      const response = await axios.patch(`${API_URL}/${id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success("Kontakt zaktualizowany!");
+      return response.data;
+    } catch (error) {
+      toast.error("Błąd podczas edytowania kontaktu.");
+      return rejectWithValue(error.response?.data || "Błąd");
+    }
   }
 );
 
@@ -89,6 +94,7 @@ const contactsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+
       .addCase(fetchContacts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -99,16 +105,25 @@ const contactsSlice = createSlice({
       })
       .addCase(fetchContacts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload || action.error.message;
       })
+
       .addCase(addContact.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
+      .addCase(addContact.rejected, (state, action) => {
+        state.error = action.payload || action.error.message;
+      })
+
       .addCase(deleteContact.fulfilled, (state, action) => {
         state.items = state.items.filter(
           (contact) => contact.id !== action.payload
         );
       })
+      .addCase(deleteContact.rejected, (state, action) => {
+        state.error = action.payload || action.error.message;
+      })
+
       .addCase(updateContact.fulfilled, (state, action) => {
         const index = state.items.findIndex(
           (contact) => contact.id === action.payload.id
@@ -116,6 +131,9 @@ const contactsSlice = createSlice({
         if (index !== -1) {
           state.items[index] = action.payload;
         }
+      })
+      .addCase(updateContact.rejected, (state, action) => {
+        state.error = action.payload || action.error.message;
       });
   }
 });

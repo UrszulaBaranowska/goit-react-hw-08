@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { updateContact } from "../redux/contactsSlice";
 import styles from "./EditContactForm.module.css";
+import toast from "react-hot-toast";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -23,9 +24,16 @@ const EditContactForm = ({ contact, onClose }) => {
     <Formik
       initialValues={{ name: contact.name, number: contact.number }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        dispatch(updateContact({ id: contact.id, updatedData: values }));
-        onClose();
+      onSubmit={async (values) => {
+        try {
+          await dispatch(
+            updateContact({ id: contact.id, updatedData: values })
+          );
+          toast.success("Kontakt zaktualizowany!"); // Powiadomienie po edycji
+          onClose();
+        } catch (error) {
+          toast.error("Błąd podczas edytowania kontaktu."); // Powiadomienie o błędzie
+        }
       }}
     >
       {() => (

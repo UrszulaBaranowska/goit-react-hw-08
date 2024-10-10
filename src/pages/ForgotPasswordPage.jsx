@@ -1,6 +1,6 @@
-
 import React, { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +12,9 @@ const ForgotPasswordPage = () => {
         "https://connections-api.goit.global/users/reset-password",
         { email }
       );
-      setMessage("Email z linkiem resetującym hasło został wysłany.");
+      toast.success("Email z linkiem resetującym hasło został wysłany.");
     } catch (error) {
-      setMessage("Błąd. Spróbuj ponownie.");
+      toast.error("Błąd. Spróbuj ponownie.");
     }
   };
 

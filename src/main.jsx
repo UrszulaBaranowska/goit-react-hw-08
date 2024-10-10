@@ -5,11 +5,13 @@ import { PersistGate } from "redux-persist/integration/react";
 import store, { persistor } from "./redux/store";
 import App from "./App";
 import "./index.css";
+import { Toaster } from "react-hot-toast";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <App />
+      <Toaster position="top-right" reverseOrder={false} /> {}
     </PersistGate>
   </Provider>
 );
