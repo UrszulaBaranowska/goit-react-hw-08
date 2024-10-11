@@ -2,23 +2,24 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { updateContact } from "../redux/contactsSlice";
-import styles from "./EditContactForm.module.css";
 import toast from "react-hot-toast";
-
-const validationSchema = Yup.object({
-  name: Yup.string()
-    .min(3, "Minimum 3 characters")
-    .max(50, "Maximum 50 characters")
-    .required("Name is required"),
-  number: Yup.string()
-    .matches(/^[0-9-]+$/, "Only numbers and dashes are allowed")
-    .required("Number is required")
-});
+import { TextField, Button, Box } from "@mui/material";
 
 const EditContactForm = ({ contact, onClose }) => {
   const dispatch = useDispatch();
+
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .min(3, "Minimum 3 characters")
+      .max(50, "Maximum 50 characters")
+      .required("Name is required"),
+    number: Yup.string()
+      .matches(/^[0-9-]+$/, "Only numbers and dashes are allowed")
+      .required("Number is required")
+  });
 
   return (
     <Formik
@@ -29,49 +30,74 @@ const EditContactForm = ({ contact, onClose }) => {
           await dispatch(
             updateContact({ id: contact.id, updatedData: values })
           );
-          toast.success("Kontakt zaktualizowany!"); // Powiadomienie po edycji
+          toast.success("Contact updated!");
           onClose();
         } catch (error) {
-          toast.error("Błąd podczas edytowania kontaktu."); // Powiadomienie o błędzie
+          toast.error("Error while editing a contact.");
         }
       }}
     >
-      {() => (
-        <Form className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="name">Name</label>
-            <Field name="name" type="text" className={styles.input} />
+      {({ handleChange, values }) => (
+        <Form>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <TextField
+              label="Name"
+              name="name"
+              value={values.name}
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+              margin="normal"
+            />
             <ErrorMessage
               name="name"
               component="div"
-              className={styles.error}
+              style={{ color: "red" }}
             />
-          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="number">Number</label>
-            <Field name="number" type="text" className={styles.input} />
+            <TextField
+              label="Number"
+              name="number"
+              value={values.number}
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+              margin="normal"
+            />
             <ErrorMessage
               name="number"
               component="div"
-              className={styles.error}
+              style={{ color: "red" }}
             />
-          </div>
 
-          <button type="submit" className={styles.button}>
-            Update Contact
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className={styles.cancelButton}
-          >
-            Cancel
-          </button>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "20px"
+              }}
+            >
+              <Button type="submit" variant="contained" color="primary">
+                Update Contact
+              </Button>
+              <Button variant="contained" color="secondary" onClick={onClose}>
+                Cancel
+              </Button>
+            </Box>
+          </Box>
         </Form>
       )}
     </Formik>
   );
+};
+
+EditContactForm.propTypes = {
+  contact: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    number: PropTypes.string.isRequired
+  }).isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
 export default EditContactForm;

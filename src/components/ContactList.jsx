@@ -5,7 +5,10 @@ import ContactItem from "../pages/ContactItem";
 import EditContactForm from "../components/EditContactForm";
 import Fuse from "fuse.js";
 import Modal from "react-modal";
-import styles from "./ContactList.module.css";
+import { Container, Typography, Button, Box } from "@mui/material";
+import toast from "react-hot-toast";
+
+Modal.setAppElement("#root");
 
 const ContactList = () => {
   const dispatch = useDispatch();
@@ -34,8 +37,8 @@ const ContactList = () => {
     );
   }, [contacts, filter]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography>Error: {error}</Typography>;
 
   const handleDelete = (contactId) => {
     setContactToDelete(contactId);
@@ -44,7 +47,14 @@ const ContactList = () => {
 
   const confirmDelete = () => {
     if (contactToDelete) {
-      dispatch(deleteContact(contactToDelete));
+      dispatch(deleteContact(contactToDelete))
+        .unwrap()
+        .then(() => {
+          toast.success("The contact has been removed!");
+        })
+        .catch(() => {
+          toast.error("An error occurred while deleting a contact.");
+        });
       setModalIsOpen(false);
       setContactToDelete(null);
     }
@@ -59,51 +69,109 @@ const ContactList = () => {
   };
 
   return (
-    <div className={styles.contactList}>
-      {filteredContacts.length > 0 ? (
-        filteredContacts.map((contact) =>
-          editingContact?.id === contact.id ? (
-            <EditContactForm
-              key={contact.id}
-              contact={editingContact}
-              onClose={handleEditClose}
-            />
-          ) : (
-            <ContactItem
-              key={contact.id}
-              contact={contact}
-              onDelete={() => handleDelete(contact.id)}
-              onEdit={() => handleEdit(contact)}
-            />
+    <Container
+      maxWidth="md"
+      sx={{ marginTop: "20px", display: "flex", justifyContent: "center" }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "16px",
+          justifyContent: "center",
+          maxWidth: "100%"
+        }}
+      >
+        {filteredContacts.length > 0 ? (
+          filteredContacts.map((contact) =>
+            editingContact?.id === contact.id ? (
+              <EditContactForm
+                key={contact.id}
+                contact={editingContact}
+                onClose={handleEditClose}
+              />
+            ) : (
+              <ContactItem
+                key={contact.id}
+                contact={contact}
+                onDelete={() => handleDelete(contact.id)}
+                onEdit={() => handleEdit(contact)}
+              />
+            )
           )
-        )
-      ) : (
-        <p>No contacts found</p>
-      )}
+        ) : (
+          <Typography>No contacts found</Typography>
+        )}
+      </Box>
 
       {}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "300px",
+            padding: "20px",
+            borderRadius: "8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden"
+          },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 1000
+          }
+        }}
         contentLabel="Confirm Delete"
-        ariaHideApp={false}
       >
-        <h2>Czy na pewno chcesz usunąć ten kontakt?</h2>
-        <button onClick={confirmDelete}>Tak</button>
-        <button onClick={() => setModalIsOpen(false)}>Nie</button>
+        <Typography variant="h6" gutterBottom textAlign="center">
+          Are you sure you want to delete this contact?
+        </Typography>
+        <Box sx={{ display: "flex", gap: "10px" }}>
+          <Button onClick={confirmDelete} variant="contained" color="secondary">
+            Tak
+          </Button>
+          <Button
+            onClick={() => setModalIsOpen(false)}
+            variant="outlined"
+            color="primary"
+          >
+            Nie
+          </Button>
+        </Box>
       </Modal>
 
+      {}
       <Modal
         isOpen={!!editingContact}
         onRequestClose={handleEditClose}
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "400px",
+            padding: "20px",
+            borderRadius: "8px",
+            overflow: "hidden"
+          },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 1000
+          }
+        }}
         contentLabel="Edit Contact"
-        ariaHideApp={false}
       >
         {editingContact && (
           <EditContactForm contact={editingContact} onClose={handleEditClose} />
         )}
       </Modal>
-    </div>
+    </Container>
   );
 };
 

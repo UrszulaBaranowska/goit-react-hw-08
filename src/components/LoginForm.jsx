@@ -1,4 +1,3 @@
-// src/components/LoginForm.jsx
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -48,7 +47,7 @@ const LoginForm = () => {
           <button type="submit">Login</button>
           {}
           <div style={{ marginTop: "10px" }}>
-            <Link to="/forgot-password">Zapomniałeś hasła?</Link>
+            <Link to="/forgot-password">Did you forget your password?</Link>
           </div>
         </Form>
       )}

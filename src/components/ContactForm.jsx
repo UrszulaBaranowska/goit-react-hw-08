@@ -1,9 +1,11 @@
+// src/components/ContactForm.jsx
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
 import { addContact } from "../redux/contactsSlice";
-import styles from "./ContactForm.module.css";
+import { TextField, Button, Box } from "@mui/material";
+import toast from "react-hot-toast";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -23,35 +25,63 @@ const ContactForm = () => {
       initialValues={{ name: "", number: "" }}
       validationSchema={validationSchema}
       onSubmit={(values, { resetForm }) => {
-        dispatch(addContact(values));
-        resetForm();
+        dispatch(addContact(values))
+          .unwrap()
+          .then(() => {
+            toast.success("Contact added!");
+            resetForm();
+          })
+          .catch(() => {
+            toast.error("Error when adding a contact.");
+          });
       }}
     >
-      {() => (
-        <Form className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="name">Name</label>
-            <Field name="name" type="text" className={styles.input} />
+      {({ handleChange, values }) => (
+        <Form>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              width: "100%",
+              maxWidth: "400px",
+              minWidth: "300px",
+              minHeight: "250px",
+              margin: "0 auto"
+            }}
+          >
+            <TextField
+              label="Name"
+              name="name"
+              value={values.name}
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+            />
             <ErrorMessage
               name="name"
               component="div"
-              className={styles.error}
+              style={{ color: "red" }}
             />
-          </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="number">Number</label>
-            <Field name="number" type="text" className={styles.input} />
+            <TextField
+              label="Number"
+              name="number"
+              value={values.number}
+              onChange={handleChange}
+              fullWidth
+              variant="outlined"
+            />
             <ErrorMessage
               name="number"
               component="div"
-              className={styles.error}
+              style={{ color: "red" }}
             />
-          </div>
 
-          <button type="submit" className={styles.button}>
-            Add Contact
-          </button>
+            <Button type="submit" variant="contained" fullWidth>
+              Add Contact
+            </Button>
+          </Box>
         </Form>
       )}
     </Formik>

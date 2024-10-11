@@ -18,15 +18,15 @@ export const registerUser = createAsyncThunk(
         const errorData = error.response.data;
         if (errorData.code === 11000) {
           return rejectWithValue({
-            message: "Ten adres e-mail jest już zarejestrowany."
+            message: "This email address is already registered."
           });
         }
         return rejectWithValue({
-          message: errorData.message || "Wystąpił błąd. Spróbuj ponownie."
+          message: errorData.message || "An error has occurred. Try again."
         });
       }
       return rejectWithValue({
-        message: "Wystąpił błąd połączenia. Spróbuj ponownie."
+        message: "A connection error has occurred. Try again."
       });
     }
   }
@@ -43,8 +43,7 @@ export const loginUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue({
-        message:
-          error.response?.data?.message || "Błąd logowania. Spróbuj ponownie."
+        message: error.response?.data?.message || "Login error. Try again."
       });
     }
   }

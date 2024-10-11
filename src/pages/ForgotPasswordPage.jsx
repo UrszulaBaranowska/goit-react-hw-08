@@ -12,9 +12,9 @@ const ForgotPasswordPage = () => {
         "https://connections-api.goit.global/users/reset-password",
         { email }
       );
-      toast.success("Email z linkiem resetującym hasło został wysłany.");
+      toast.success("An email with a password reset link has been sent.");
     } catch (error) {
-      toast.error("Błąd. Spróbuj ponownie.");
+      toast.error("Error. Try again.");
     }
   };
 
@@ -23,7 +23,7 @@ const ForgotPasswordPage = () => {
       <h2>Odzyskiwanie hasła</h2>
       <input
         type="email"
-        placeholder="Podaj swój adres email"
+        placeholder="Enter your email address"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />

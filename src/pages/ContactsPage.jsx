@@ -1,29 +1,19 @@
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/authSlice";
+// src/pages/ContactsPage.jsx
+import React from "react";
 import ContactList from "../components/ContactList";
 import ContactForm from "../components/ContactForm";
 import SearchBox from "../components/SearchBox";
-import { useNavigate } from "react-router-dom";
+import { Container, Box } from "@mui/material";
 
 const ContactsPage = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/");
-  };
-
   return (
-    <div>
-      <h2>Twoje kontakty</h2>
-      <button onClick={handleLogout} style={{ marginBottom: "20px" }}>
-        Wyloguj
-      </button>
-      <SearchBox />
+    <Container maxWidth="md" sx={{ textAlign: "center", marginTop: "20px" }}>
+      <Box sx={{ marginBottom: "20px" }}>
+        <SearchBox />
+      </Box>
       <ContactForm />
       <ContactList />
-    </div>
+    </Container>
   );
 };
 

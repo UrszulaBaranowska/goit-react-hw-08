@@ -9,8 +9,8 @@ export const fetchContacts = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     const { token } = getState().auth;
     if (!token) {
-      toast.error("Brak tokena autoryzacyjnego. Zaloguj się ponownie.");
-      return rejectWithValue("Brak tokena autoryzacyjnego.");
+      toast.error("Authorization token missing. Log in again.");
+      return rejectWithValue("No authorization token.");
     }
     try {
       const response = await axios.get(API_URL, {
@@ -18,11 +18,11 @@ export const fetchContacts = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
-      toast.success("Kontakty zostały pobrane!");
+      toast.success("The contacts have been downloaded!");
       return response.data;
     } catch (error) {
-      toast.error("Błąd podczas pobierania kontaktów.");
-      return rejectWithValue(error.response?.data?.message || "Błąd");
+      toast.error("Error while downloading contacts.");
+      return rejectWithValue(error.response?.data?.message || "Error");
     }
   }
 );
@@ -37,11 +37,11 @@ export const addContact = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
-      toast.success("Kontakt dodany!");
+      toast.success("Contact added!");
       return response.data;
     } catch (error) {
-      toast.error("Błąd podczas dodawania kontaktu.");
-      return rejectWithValue(error.response?.data || "Błąd");
+      toast.error("Error when adding a contact.");
+      return rejectWithValue(error.response?.data || "Error");
     }
   }
 );
@@ -56,11 +56,11 @@ export const deleteContact = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
-      toast.success("Kontakt usunięty!");
+      toast.success("Contact removed!");
       return contactId;
     } catch (error) {
-      toast.error("Błąd podczas usuwania kontaktu.");
-      return rejectWithValue(error.response?.data || "Błąd");
+      toast.error("Error while deleting a contact.");
+      return rejectWithValue(error.response?.data || "Error");
     }
   }
 );
@@ -75,11 +75,11 @@ export const updateContact = createAsyncThunk(
           Authorization: `Bearer ${token}`
         }
       });
-      toast.success("Kontakt zaktualizowany!");
+      toast.success("Contact updated!");
       return response.data;
     } catch (error) {
-      toast.error("Błąd podczas edytowania kontaktu.");
-      return rejectWithValue(error.response?.data || "Błąd");
+      toast.error("Error while editing a contact.");
+      return rejectWithValue(error.response?.data || "Error");
     }
   }
 );
