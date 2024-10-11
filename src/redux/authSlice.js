@@ -40,7 +40,11 @@ export const loginUser = createAsyncThunk(
         email: credentials.email,
         password: credentials.password
       });
-      return response.data;
+
+      return {
+        user: response.data.user,
+        token: response.data.token
+      };
     } catch (error) {
       return rejectWithValue({
         message: error.response?.data?.message || "Login error. Try again."

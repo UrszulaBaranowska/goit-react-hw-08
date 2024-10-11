@@ -14,6 +14,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const userName = useSelector((state) => state.auth.user?.name);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -21,14 +22,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar
-      position="static"
-      color="primary"
-      sx={{
-        width: "100%",
-        overflow: "hidden"
-      }}
-    >
+    <AppBar position="static" color="primary" sx={{ width: "100vw" }}>
       <Toolbar sx={{ justifyContent: "space-between", padding: "0 20px" }}>
         <IconButton edge="start" color="inherit" onClick={() => navigate("/")}>
           <HomeIcon />
@@ -37,6 +31,11 @@ const Navbar = () => {
           Phonebook Application
         </Typography>
         <Box sx={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          {isAuthenticated && userName && (
+            <Typography variant="body1" color="inherit">
+              Welcome, {userName}!
+            </Typography>
+          )}
           {!isAuthenticated ? (
             <>
               <Button color="inherit" onClick={() => navigate("/login")}>
